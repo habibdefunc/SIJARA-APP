@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import Sidebar from "./navigation/sidebar";
 import NavbarComp from "./navigation/navbar";
-import Footer from "./navigation/footer";
+
 
 const DashboardComp = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
