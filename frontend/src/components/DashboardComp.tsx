@@ -11,7 +11,6 @@ import {
 import Sidebar from "./navigation/sidebar";
 import NavbarComp from "./navigation/navbar";
 
-
 const DashboardComp = () => {
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
