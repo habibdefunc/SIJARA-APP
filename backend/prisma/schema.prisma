@@ -1,14 +1,64 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  nama     String
+  username String @unique
+  password String
+  role     Role   @default(USER)
+}
+
+model Ruangan {
+  id         Int          @id @default(autoincrement())
+  nama       String
+  kodeRuangan String      @unique
+  agendaRapat AgendaRapat[]
+}
+
+model JenisRapat {
+  id           Int          @id @default(autoincrement())
+  nama         String
+  kodeJenisRapat String     @unique
+  agendaRapat   AgendaRapat[]
+}
+
+model Pimpinan {
+  id          Int          @id @default(autoincrement())
+  nama        String
+  kodePimpinan String      @unique
+  agendaRapat AgendaRapat[]
+}
+
+model Hari {
+  id         Int          @id @default(autoincrement())
+  hari       String
+  kodeHari   String        @unique
+  agendaRapat AgendaRapat[]
+}
+
+model AgendaRapat {
+  id           Int          @id @default(autoincrement())
+  nama         String
+  kodeRuangan  String
+  kodeHari     String
+  jam          String
+  kodePimpinan String
+  peserta      String
+  ruangan      Ruangan      @relation(fields: [kodeRuangan], references: [kodeRuangan])
+  hari         Hari         @relation(fields: [kodeHari], references: [kodeHari])
+  pimpinan     Pimpinan     @relation(fields: [kodePimpinan], references: [kodePimpinan])
+  jenisRapat   JenisRapat?  @relation(fields: [jenisRapatId], references: [id])
+  jenisRapatId Int?
+}
+
+enum Role {
+  ADMIN
+  USER
 }
