@@ -12,7 +12,7 @@ model User {
   nama     String
   username String @unique
   password String
-  role     Role   @default(USER)
+  role?     Role   @default(USER)
 }
 
 model Ruangan {
