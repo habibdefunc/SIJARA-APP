@@ -1,18 +1,18 @@
 import express from "express";
 import {
-  createUser,
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-} from "../controllers/user.controller";
+  createPimpinan,
+  getAllPimpinans,
+  getPimpinanById,
+  updatePimpinan,
+  deletePimpinan,
+} from "../controllers/pimpinan.controller";
 
 const router = express.Router();
 
-router.get("/", getAllUsers);
-router.get("/:id", getUserById);
-router.post("/", createUser);
-router.patch("/:id", updateUser);
-router.delete("/:id", deleteUser);
+router.get("/", getAllPimpinans);
+router.get("/:id", getPimpinanById);
+router.post("/", createPimpinan);
+router.patch("/:id", updatePimpinan);
+router.delete("/:id", deletePimpinan);
 
 export default router;
