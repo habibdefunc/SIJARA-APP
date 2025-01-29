@@ -12,7 +12,7 @@ model User {
   nama     String
   username String @unique
   password String
-  role?     Role   @default(USER)
+  role     Role   @default(USER)
 }
 
 model Ruangan {
@@ -22,7 +22,7 @@ model Ruangan {
   agendaRapat AgendaRapat[]
 }
 
-model JenisRapat {
+model Jenis {
   id           Int          @id @default(autoincrement())
   nama         String
   kodeJenisRapat String     @unique
@@ -54,7 +54,7 @@ model AgendaRapat {
   ruangan      Ruangan      @relation(fields: [kodeRuangan], references: [kodeRuangan])
   hari         Hari         @relation(fields: [kodeHari], references: [kodeHari])
   pimpinan     Pimpinan     @relation(fields: [kodePimpinan], references: [kodePimpinan])
-  jenisRapat   JenisRapat?  @relation(fields: [jenisRapatId], references: [id])
+  jenisRapat   Jenis?  @relation(fields: [jenisRapatId], references: [id])
   jenisRapatId Int?
 }
 

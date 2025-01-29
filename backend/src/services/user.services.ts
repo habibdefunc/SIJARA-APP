@@ -1,5 +1,6 @@
 import prisma from "../prisma/prismaClient";
 import { CreateUserInput, UpdateUserInput } from "../types/user.types";
+import bcrypt from "bcryptjs";
 
 export const getAllUsersService = async () => {
   return await prisma.user.findMany();
@@ -12,11 +13,12 @@ export const getUserByIdService = async (id: number) => {
 };
 
 export const createUserService = async (data: CreateUserInput) => {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
   return await prisma.user.create({
     data: {
       nama: data.nama,
       username: data.username,
-      password: data.password,
+      password: hashedPassword,
       role: data.role || "USER",
     },
   });
