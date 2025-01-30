@@ -6,6 +6,7 @@ import gedungRoutes from "./routes/gedung.routes";
 import pimpinanRoutes from "./routes/pimpinan.routes";
 import hariRoutes from "./routes/hari.routes";
 import jenisRoutes from "./routes/jenis.routes";
+import rapatRoutes from "./routes/rapat.routes";
 import { errorHandler } from "./utils/errorHandler";
 
 dotenv.config();
@@ -24,6 +25,7 @@ app.use("/api/buildings", gedungRoutes);
 app.use("/api/leaders", pimpinanRoutes);
 app.use("/api/days", hariRoutes);
 app.use("/api/meets", jenisRoutes);
+app.use("/api/CreateMeets", rapatRoutes);
 
 app.use(errorHandler);
 
