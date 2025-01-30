@@ -14,7 +14,7 @@ export const getGedungByIdService = async (id: number) => {
 export const createGedungService = async (data: CreateJenisInput) => {
   return await prisma.hari.create({
     data: {
-      hari: data.nama,
+      hari: data.hari,
       kodeHari: data.kodeHari,
     },
   });
@@ -24,14 +24,14 @@ export const updateGedungService = async (
   id: number,
   data: UpdateJenisInput
 ) => {
-  return await prisma.jenis.update({
+  return await prisma.hari.update({
     where: { id },
     data,
   });
 };
 
 export const deleteGedungService = async (id: number) => {
-  return await prisma.jenis.delete({
+  return await prisma.hari.delete({
     where: { id },
   });
 };
