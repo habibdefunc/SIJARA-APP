@@ -1,14 +1,29 @@
+import { useState, useEffect } from "react";
 import { Button, Navbar, Dropdown, DropdownButton } from "react-bootstrap";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { FaCog, FaSignOutAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const NavbarComp = ({ toggleSidebar }: any) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState<{ username: string } | null>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userData = sessionStorage.getItem("user");
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const handleSidebarToggle = () => {
     setSidebarOpen(!sidebarOpen);
     toggleSidebar();
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("user");
+    navigate("/login");
   };
 
   return (
@@ -24,7 +39,7 @@ const NavbarComp = ({ toggleSidebar }: any) => {
       <div className="ms-auto d-flex align-items-center">
         <DropdownButton
           id="dropdown-custom-components"
-          title="Hey, User"
+          title={`Hey, ${user?.username || "User"}`}
           variant="light"
           align="end"
         >
@@ -32,7 +47,7 @@ const NavbarComp = ({ toggleSidebar }: any) => {
             <FaCog style={{ marginRight: "8px" }} /> Settings
           </Dropdown.Item>
           <Dropdown.Divider />
-          <Dropdown.Item href="#action2">
+          <Dropdown.Item onClick={handleLogout}>
             <FaSignOutAlt style={{ marginRight: "8px" }} /> Logout
           </Dropdown.Item>
         </DropdownButton>

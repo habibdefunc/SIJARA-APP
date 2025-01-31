@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
 const FormComp = ({ title, fields, onSubmit, onClose, show }) => {
-  const [formData, setFormData] = React.useState(
-    fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {})
-  );
+  const [formData, setFormData] = React.useState({});
+
+  useEffect(() => {
+    const initialFormData = fields.reduce(
+      (acc, field) => ({ ...acc, [field.name]: field.value || "" }),
+      {}
+    );
+    setFormData(initialFormData);
+  }, [fields]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,12 +31,26 @@ const FormComp = ({ title, fields, onSubmit, onClose, show }) => {
           {fields.map((field, index) => (
             <Form.Group key={index} className="mb-3">
               <Form.Label>{field.label}</Form.Label>
-              <Form.Control
-                type={field.type}
-                name={field.name}
-                value={formData[field.name]}
-                onChange={handleChange}
-              />
+              {field.type === "select" ? (
+                <Form.Select
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                >
+                  {field.options.map((option, i) => (
+                    <option key={i} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </Form.Select>
+              ) : (
+                <Form.Control
+                  type={field.type}
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                />
+              )}
             </Form.Group>
           ))}
         </Form>

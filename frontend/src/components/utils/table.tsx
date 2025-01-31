@@ -1,12 +1,32 @@
-import React from "react";
-import { Table } from "react-bootstrap";
+import React, { useState } from "react";
+import { Table, Pagination } from "react-bootstrap";
 
 interface TableCompProps {
   columns: string[];
   data: any[];
+  itemsPerPage?: number;
 }
 
-const TableComp: React.FC<TableCompProps> = ({ columns, data }) => {
+const TableComp: React.FC<TableCompProps> = ({
+  columns,
+  data,
+  itemsPerPage = 5,
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalItems = data.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentData = data.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
     <div>
       <style>{`
@@ -58,6 +78,12 @@ const TableComp: React.FC<TableCompProps> = ({ columns, data }) => {
             padding: 8px;
           }
         }
+
+        .pagination-container {
+          display: flex;
+          justify-content: center;
+          margin-top: 15px;
+        }
       `}</style>
 
       <Table striped bordered hover responsive className="custom-table">
@@ -69,7 +95,7 @@ const TableComp: React.FC<TableCompProps> = ({ columns, data }) => {
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIndex) => (
+          {currentData.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {columns.map((column, colIndex) => (
                 <td key={colIndex}>{row[column]}</td>
@@ -78,6 +104,28 @@ const TableComp: React.FC<TableCompProps> = ({ columns, data }) => {
           ))}
         </tbody>
       </Table>
+
+      <div className="pagination-container">
+        <Pagination>
+          <Pagination.Prev
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          />
+          {[...Array(totalPages)].map((_, index) => (
+            <Pagination.Item
+              key={index + 1}
+              active={index + 1 === currentPage}
+              onClick={() => handlePageChange(index + 1)}
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+          <Pagination.Next
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          />
+        </Pagination>
+      </div>
     </div>
   );
 };

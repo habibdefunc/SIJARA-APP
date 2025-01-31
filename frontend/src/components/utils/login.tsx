@@ -7,24 +7,90 @@ import {
   Col,
   InputGroup,
   Image,
+  Toast,
+  ToastContainer,
 } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const LoginComp = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
+    role: "",
     remember: false,
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastVariant, setToastVariant] = useState("success");
 
-  const handleChange = (e) => {
+  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
+    setLoading(true);
+    setErrorMessage(null);
+
+    try {
+      const response = await axios.get(`${API_URL}/users`, {
+        params: {
+          username: formData.username,
+          password: formData.password,
+        },
+      });
+
+      if (response.status === 200) {
+        const user = response.data.find(
+          (user: any) => user.username === formData.username
+        );
+        if (user) {
+          setFormData((prevData) => ({
+            ...prevData,
+            role: user.role, // Set the role here
+          }));
+
+          const data = { username: formData.username, role: user.role };
+          if (formData.remember) {
+            localStorage.setItem("user", JSON.stringify(data));
+          } else {
+            sessionStorage.setItem("user", JSON.stringify(data));
+          }
+
+          setToastMessage("Login Successful!");
+          setToastVariant("success");
+          setShowToast(true);
+          setTimeout(() => {
+            navigate("/");
+          }, 1500);
+        } else {
+          setToastMessage("User not found.");
+          setToastVariant("danger");
+          setShowToast(true);
+        }
+      } else {
+        setToastMessage(
+          response.data.message || "Login failed. Please try again."
+        );
+        setToastVariant("danger");
+        setShowToast(true);
+      }
+    } catch (error) {
+      setToastMessage("An error occurred. Please try again later.");
+      setToastVariant("danger");
+      setShowToast(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,7 +99,6 @@ const LoginComp = () => {
       className="login-container d-flex align-items-center justify-content-center"
     >
       <Row className="align-items-center w-100">
-        {/* Bagian Kiri: Ilustrasi */}
         <Col md={6} className="d-none d-md-block text-center">
           <Image
             src="../../../public/login.svg"
@@ -42,11 +107,8 @@ const LoginComp = () => {
             className="login-illustration"
           />
         </Col>
-
-        {/* Bagian Kanan: Form Login */}
         <Col xs={12} md={6}>
           <div className="login-card p-4 p-md-5">
-            {/* Logo dan Tulisan */}
             <div className="text-center mb-4">
               <Image
                 src="../../../public/dishub.png"
@@ -59,23 +121,18 @@ const LoginComp = () => {
                 Sistem Informasi Penjadwalan Rapat
               </p>
             </div>
-
-            {/* Form */}
             <Form onSubmit={handleSubmit}>
-              {/* Email Field */}
-              <Form.Group className="mb-3" controlId="formEmail">
-                <Form.Label>Email Address</Form.Label>
+              <Form.Group className="mb-3" controlId="formUsername">
+                <Form.Label>Username</Form.Label>
                 <Form.Control
-                  type="email"
-                  name="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
+                  type="text"
+                  name="username"
+                  placeholder="Enter your username"
+                  value={formData.username}
                   onChange={handleChange}
                   required
                 />
               </Form.Group>
-
-              {/* Password Field */}
               <Form.Group className="mb-3" controlId="formPassword">
                 <Form.Label>Password</Form.Label>
                 <InputGroup>
@@ -95,8 +152,6 @@ const LoginComp = () => {
                   </Button>
                 </InputGroup>
               </Form.Group>
-
-              {/* Remember Me Checkbox */}
               <Form.Group className="mb-3" controlId="formRememberMe">
                 <Form.Check
                   type="checkbox"
@@ -106,17 +161,32 @@ const LoginComp = () => {
                   onChange={handleChange}
                 />
               </Form.Group>
-
-              {/* Submit Button */}
-              <Button variant="primary" type="submit" className="w-100">
-                Login
+              {errorMessage && <p className="text-danger">{errorMessage}</p>}
+              <Button
+                variant="primary"
+                type="submit"
+                className="w-100"
+                disabled={loading}
+              >
+                {loading ? "Logging in..." : "Login"}
               </Button>
             </Form>
           </div>
         </Col>
       </Row>
 
-      {/* Custom CSS */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={3000}
+          autohide
+          bg={toastVariant}
+        >
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
+
       <style>{`
         .login-container {
           min-height: 100vh;
